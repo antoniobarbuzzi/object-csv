@@ -8,11 +8,15 @@ publishMavenStyle := true
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.1.5" % "test"
 
-libraryDependencies += "com.github.tototoshi" % "scala-csv_2.10" % "1.0.0"
+
+libraryDependencies += "com.github.tototoshi" % "scala-csv_2.11" % "1.2.2"
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
 
 libraryDependencies += "org.scala-lang" % "scala-parser-combinators" % "2.11.0-M4"
+
+libraryDependencies += "junit" % "junit" % "4.11"
+
 
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"
@@ -26,10 +30,10 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-organization := "com.gingersoftware"
+organization := "com.github.antoniobarbuzzi"
 
 pomExtra := (
-  <url>https://github.com/dorony/object-csv</url>
+  <url>https://github.com/antoniobarbuzzi/object-csv</url>
     <licenses>
       <license>
         <name>Apache 2.0</name>
@@ -38,13 +42,17 @@ pomExtra := (
       </license>
     </licenses>
     <scm>
-      <url>git@github.com:dorony/object-csv.git</url>
-      <connection>scm:git@github.com:dorony/object-csv.git</connection>
+      <url>git@github.com:antoniobarbuzzi/object-csv.git</url>
+      <connection>scm:git@github.com:antoniobarbuzzi/object-csv.git</connection>
     </scm>
     <developers>
       <developer>
         <id>dorony</id>
         <name>Doron Yaacoby</name>
         <url>http://blogs.microsoft.co.il/blogs/dorony</url>
+      </developer>
+      <developer>
+        <id>antoniobarbuzzi</id>
+        <name>Antonio Barbuzzi</name>
       </developer>
     </developers>)

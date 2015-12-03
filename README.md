@@ -1,5 +1,14 @@
 object-csv
 ==========
+#The fork
+The semantic of the library has changed a bit
+ - missing values are treated as errors, and no default field is used
+ - the only missing values allowed are Optional fields - or fields with default
+ - if a field is missing, and it has a default value, the default value is used
+
+Moreover:
+ - new types available, with Optional
+
 #Updates
 Thanks to a contribution by [aandeers](https://github.com/aandeers) version 0.2 is now available, which allows you to customize the csv delimiters, by passing a Config() object to ObjectCSV. Note that you now have to create an instance of ObjectCSV, as shown below.
 
