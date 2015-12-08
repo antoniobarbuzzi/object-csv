@@ -1,5 +1,7 @@
 package com.gingersoftware.csv
 
+import java.time.{LocalDate, LocalDateTime}
+
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
 
@@ -12,6 +14,7 @@ import scala.reflect.runtime.{universe => ru}
 import java.util.concurrent.ConcurrentHashMap
 
 import scala.reflect.runtime.{universe => ru}
+
 
 private[csv] class ObjectConverter {
   private val cache = new ConcurrentHashMap[ru.TypeTag[_], (ru.MethodMirror, List[(String, ru.Type, Option[Any])])]()
@@ -68,6 +71,8 @@ private[csv] class ObjectConverter {
       case _ if t =:= ru.typeOf[Boolean] => v.toBoolean
       case _ if t =:= ru.typeOf[Long] => v.toLong
       case _ if t =:= ru.typeOf[BigDecimal] => BigDecimal(v)
+      case _ if t =:= ru.typeOf[LocalDateTime] => LocalDateTime.parse(v)
+      case _ if t =:= ru.typeOf[LocalDate] => LocalDate.parse(v)
 
       //Converting empty string to None instead of Some(emptyString)
       case _ if t =:= ru.typeOf[Option[String]] && v.isEmpty => None
@@ -78,6 +83,8 @@ private[csv] class ObjectConverter {
       case _ if t =:= ru.typeOf[Option[Boolean]] => if (isNullOrEmpty(v)) None else Some(v.toBoolean)
       case _ if t =:= ru.typeOf[Option[Long]] => if (isNullOrEmpty(v)) None else Some(v.toLong)
       case _ if t =:= ru.typeOf[Option[BigDecimal]] => if (isNullOrEmpty(v)) None else Some(BigDecimal(v))
+      case _ if t =:= ru.typeOf[Option[LocalDateTime]] => if (isNullOrEmpty(v)) None else Some(LocalDateTime.parse(v))
+      case _ if t =:= ru.typeOf[Option[LocalDate]] => if (isNullOrEmpty(v)) None else Some(LocalDate.parse(v))
 
       case _ => throw new IllegalStateException(s"Cannot convert $v to type $t")
     }

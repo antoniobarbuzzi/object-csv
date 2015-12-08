@@ -4,27 +4,31 @@ package com.gingersoftware.csv
  * Created by dorony on 01/05/14.
  */
 
+import java.time.{LocalDateTime, LocalDate}
+
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FlatSpec, Matchers}
 
 object ObjectConverterTest {
-  val personHeader = Array("name", "age", "salary", "userID", "isNice", "money", "optString", "optInt", "optDouble", "optLong", "optBoolean", "optBigDecimal")
+  val personHeader = Array("name", "age", "salary", "userID", "isNice", "money", "dateOfBirth", "alarmTime", "optString", "optInt", "optDouble", "optLong", "optBoolean", "optBigDecimal", "optDate", "optTime")
 }
 
 @RunWith(classOf[JUnitRunner])
 class ObjectConverterTest extends FlatSpec with Matchers {
   val converter = new ObjectConverter()
+  private val defaultDate = LocalDate.of(1999, 12, 31)
+  private val defaultTime = LocalDateTime.of(2015, 12, 7, 11, 41, 21, 818000000)
 
   "ObjectConverter.toObject" should "instantiates the object correctly" in {
-    val person = converter.toObject[Person](Array("Doron","30","25.5","123", "true", "2.718"), ObjectConverterTest.personHeader)
-    val expected = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"))
+    val person = converter.toObject[Person](Array("Doron","30","25.5","123", "true", "2.718", "1999-12-31", "2015-12-07T11:41:21.818"), ObjectConverterTest.personHeader)
+    val expected = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), defaultDate, defaultTime)
     person should be(expected)
   }
 
   it should "handle optional values" in {
-    val person = converter.toObject[Person](Array("Doron","30","25.5","123", "true", "2.718", "optString", "3", "2.2", "9", "true", "5555.12"), ObjectConverterTest.personHeader)
-    val expected = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), Some("optString"), Some(3), Some(2.2), Some(9l), Some(true), Some(BigDecimal("5555.12")))
+    val person = converter.toObject[Person](Array("Doron","30","25.5","123", "true", "2.718", "1999-12-31", "2015-12-07T11:41:21.818", "optString", "3", "2.2", "9", "true", "5555.12", "1999-12-31", "2015-12-07T11:41:21.818"), ObjectConverterTest.personHeader)
+    val expected = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), defaultDate, defaultTime, Some("optString"), Some(3), Some(2.2), Some(9l), Some(true), Some(BigDecimal("5555.12")), Some(defaultDate), Some(defaultTime))
     person should be(expected)
   }
 
@@ -45,9 +49,9 @@ class ObjectConverterTest extends FlatSpec with Matchers {
   }
 
   it should "convert snake_case header into camelCase" in {
-    val camelCaseHeader = Array("name", "age", "salary", "userID", "is_nice", "money", "opt_string", "opt_int", "opt_double", "opt_long", "opt_boolean", "opt_big_decimal")
-    val person = converter.toObject[Person](Array("Doron","30","25.5","123", "true", "2.718", "optString", "3", "2.2", "9", "true", "5555.12"), camelCaseHeader)
-    val expected = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), Some("optString"), Some(3), Some(2.2), Some(9l), Some(true), Some(BigDecimal("5555.12")))
+    val snakeCaseHeader = Array("name", "age", "salary", "userID", "is_nice", "money", "date_of_birth", "alarm_time", "opt_string", "opt_int", "opt_double", "opt_long", "opt_boolean", "opt_big_decimal", "opt_date", "opt_time")
+    val person = converter.toObject[Person](Array("Doron","30","25.5","123", "true", "2.718", "1999-12-31", "2015-12-07T11:41:21.818", "optString", "3", "2.2", "9", "true", "5555.12", "1999-12-31", "2015-12-07T11:41:21.818"), snakeCaseHeader)
+    val expected = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), defaultDate, defaultTime, Some("optString"), Some(3), Some(2.2), Some(9l), Some(true), Some(BigDecimal("5555.12")),  Some(defaultDate), Some(defaultTime))
     person should be(expected)
   }
 
@@ -67,21 +71,21 @@ class ObjectConverterTest extends FlatSpec with Matchers {
   }
 
   "ObjectConverter.fromObject" should "follow the order of the header when converting" in {
-    val person = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"))
+    val person = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), defaultDate, defaultTime)
     val result = converter.fromObject(person, Array("salary", "name", "age", "money", "userID"))
     result should be(IndexedSeq("25.5", "Doron", "30", "2.718", "123"))
   }
 
   it should "convert empty options to empty string" in {
-    val person = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"))
+    val person = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), defaultDate, defaultTime)
     val result = converter.fromObject(person, ObjectConverterTest.personHeader)
-    result should be(IndexedSeq("Doron", "30", "25.5", "123", "true", "2.718", "", "", "", "", "", ""))
+    result should be(IndexedSeq("Doron", "30", "25.5", "123", "true", "2.718", "1999-12-31", "2015-12-07T11:41:21.818", "", "", "", "", "", "", "", ""))
   }
 
   it should "convert not empty options to the values of the objects" in {
-    val person = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), optString = Some("not-empty"), optInt = Some(2), optBigDecimal = Some(BigDecimal("3.12")))
+    val person = Person("Doron", 30, 25.5, 123l, true, money = BigDecimal("2.718"), defaultDate, defaultTime, optString = Some("not-empty"), optInt = Some(2), optBigDecimal = Some(BigDecimal("3.12")), optDate = Some(defaultDate), optTime = Some(defaultTime))
     val result = converter.fromObject(person, ObjectConverterTest.personHeader)
-    result should be(IndexedSeq("Doron", "30", "25.5", "123", "true", "2.718", "not-empty", "2", "", "", "", "3.12"))
+    result should be(IndexedSeq("Doron", "30", "25.5", "123", "true", "2.718", "1999-12-31", "2015-12-07T11:41:21.818", "not-empty", "2", "", "", "", "3.12", "1999-12-31", "2015-12-07T11:41:21.818"))
   }
 
   "ObjectConverter.getHeader" should "returns the ctor parameter names" in {
@@ -97,12 +101,16 @@ case class Person(name: String,
                   userID: Long,
                   isNice: Boolean,
                   money: BigDecimal,
+                  dateOfBirth: LocalDate,
+                  alarmTime: LocalDateTime,
                   optString: Option[String] = None,
                   optInt: Option[Int] = None,
                   optDouble: Option[Double] = None,
                   optLong: Option[Long] = None,
                   optBoolean: Option[Boolean] = None,
-                  optBigDecimal: Option[BigDecimal] = None)
+                  optBigDecimal: Option[BigDecimal] = None,
+                  optDate: Option[LocalDate] = None,
+                  optTime: Option[LocalDateTime] = None)
 
 
 case class PersonWithDefaults(name: String,
@@ -111,11 +119,15 @@ case class PersonWithDefaults(name: String,
                               userID: Long = 0l,
                               isNice: Boolean = false,
                               money: BigDecimal = BigDecimal("3.3"),
+                              dateOfBirth: LocalDate = LocalDate.of(2000, 1, 2),
+                              alarmTime: LocalDateTime = LocalDateTime.of(2000, 1, 2, 13, 12, 23, 3213),
                               optString: Option[String] = Some("a default value"),
                               optInt: Option[Int] = None,
                               optDouble: Option[Double] = None,
                               optLong: Option[Long] = None,
                               optBoolean: Option[Boolean] = None,
-                              optBigDecimal: Option[BigDecimal] = None)
+                              optBigDecimal: Option[BigDecimal] = None,
+                              optDate: Option[LocalDate] = None,
+                              optTime: Option[LocalDateTime] = None)
 
 case class PersonWithNonDefaultOption(name: String, other: Option[String])

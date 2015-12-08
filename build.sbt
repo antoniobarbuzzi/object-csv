@@ -1,8 +1,24 @@
 name := "object-csv"
 
-version := "0.1"
+version := "0.1.1"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
+
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
+
+initialize := {
+  val _ = initialize.value
+  if (sys.props("java.specification.version") != "1.8")
+    sys.error("Java 8 is required for this project.")
+}
+
+scalacOptions += "-target:jvm-1.8"
+
+initialize := {
+  val _ = initialize.value
+  if (sys.props("java.specification.version") != "1.8")
+    sys.error("Java 8 is required for this project.")
+}
 
 publishMavenStyle := true
 
@@ -17,6 +33,7 @@ libraryDependencies += "org.scala-lang" % "scala-parser-combinators" % "2.11.0-M
 
 libraryDependencies += "junit" % "junit" % "4.11"
 
+scalacOptions += "-target:jvm-1.8"
 
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"

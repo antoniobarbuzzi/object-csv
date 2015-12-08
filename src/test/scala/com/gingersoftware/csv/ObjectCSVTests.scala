@@ -1,6 +1,7 @@
 package com.gingersoftware.csv
 
 import java.io.{File, StringWriter}
+import java.time.{LocalDate, LocalDateTime}
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -16,8 +17,9 @@ class ObjectCSVTests extends FlatSpec with Matchers {
   "ObjectCSV" should "write and read a csv file" in {
     val file = File.createTempFile("test", ".csv")
     try {
-      val person1 = new Person("Doron,y\",\"", 10, 5.5, 1l, false, BigDecimal(10))
-      val person2 = new Person("David", 20, 7.5, 2l, true, BigDecimal("13.3"), optString = Some(",ëçûæ,ëçû\"æëçûæëçûæëçûæëçûæɧɧɧɧɧࢠ"), optInt = Some(3))
+
+      val person1 = new Person("Doron,y\",\"", 10, 5.5, 1l, false, BigDecimal(10), LocalDate.of(1985, 11, 26), LocalDateTime.of(2015, 11, 26, 1, 21, 0, 123))
+      val person2 = new Person("David", 20, 7.5, 2l, true, BigDecimal("13.3"), LocalDate.now(), LocalDateTime.now(), optString = Some(",ëçûæ,ëçû\"æëçûæëçûæëçûæëçûæɧɧɧɧɧࢠ"), optInt = Some(3))
 
       //Write
       val objectCsv = ObjectCSV()
@@ -38,13 +40,13 @@ class ObjectCSVTests extends FlatSpec with Matchers {
   }
 
   it should "customize header, delimiter, lineTerminator" in {
-    val person = new Person("Marty", 10, 5.5, 1l, false, BigDecimal(10))
+    val person = new Person("Marty", 10, 5.5, 1l, false, BigDecimal(10), LocalDate.of(1985, 11, 26), LocalDateTime.of(1955, 11, 12, 20, 4))
     val stringWriter = new StringWriter
-    ObjectCSV(CSVConfig(header = "", delimiter = ':', lineTerminator = "$")).writeCSV(IndexedSeq(person), stringWriter)
+    ObjectCSV(CSVConfig(header = "", delimiter = '~', lineTerminator = "$")).writeCSV(IndexedSeq(person), stringWriter)
     val lines = stringWriter.toString.split("\\$")
     lines.length should be(2)
     lines(0).startsWith("name") should be(true)
-    lines(0).count(c => c == ':') should be(11)
-    lines(1).count(c => c == ':') should be(11)
+    lines(0).count(c => c == '~') should be(15)
+    lines(1).count(c => c == '~') should be(15)
   }
 }
